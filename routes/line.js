@@ -18,7 +18,7 @@ router.post('/', async function(req, res, next) {
     const lineToken = process.env.LINE_ACCESS_TOKEN
     for (const e of events) {
         const { type, id } = e.message
-        if (type === 'image') {
+        if (type === 'image' || type === 'video') {
             console.log(id)
             let image
             try {
@@ -31,7 +31,8 @@ router.post('/', async function(req, res, next) {
                 const uploadToken = await uploadImageToGooglePhotos(
                     image,
                     token,
-                    id
+                    id,
+                    getExtenstionFromType(type)
                 )
                 uploadTokens.push(uploadToken)
             } catch (e) {
@@ -48,6 +49,13 @@ router.post('/', async function(req, res, next) {
         return
     }
 })
+
+function getExtenstionFromType(type) {
+    if (type === 'image') {
+        return 'jpg'
+    }
+    return 'mov'
+}
 
 function getImage(messageId, token) {
     return new Promise((resolve, reject) => {
@@ -78,7 +86,7 @@ function getImage(messageId, token) {
         req.end()
     })
 }
-const {REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET} = process.env
+const { REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET } = process.env
 
 function getGoogleAccessToken() {
     return new Promise((resolve, reject) => {
@@ -107,7 +115,7 @@ function getGoogleAccessToken() {
     })
 }
 
-function uploadImageToGooglePhotos(image, token, id) {
+function uploadImageToGooglePhotos(image, token, id, extention) {
     return new Promise((resolve, reject) => {
         const send_options = {
             host: 'photoslibrary.googleapis.com',
@@ -117,7 +125,7 @@ function uploadImageToGooglePhotos(image, token, id) {
             headers: {
                 'Content-type': 'application/octet-stream',
                 'Content-Length': image.length,
-                'X-Goog-Upload-File-Name': `${id}.jpg`,
+                'X-Goog-Upload-File-Name': `${id}.${extention}`,
                 'X-Goog-Upload-Protocol': 'raw',
                 Authorization: `Bearer ${token}`,
             },
@@ -132,6 +140,7 @@ function uploadImageToGooglePhotos(image, token, id) {
                     reject(err)
                 })
                 .on('end', function() {
+                    console.log(data.toString())
                     if (data != null) {
                         resolve(data.toString())
                     }

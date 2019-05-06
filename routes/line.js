@@ -13,6 +13,7 @@ router.post('/', async function(req, res, next) {
         return
     }
     const { events } = req.body
+    console.log(events)
     const uploadTokens = []
     const lineToken = process.env.LINE_ACCESS_TOKEN
     for (const e of events) {

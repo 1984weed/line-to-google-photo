@@ -11,7 +11,7 @@ const config = {
 
 const client = new line.Client(config);
 
-router.post('/', async function(req, res, next) {
+router.post('/callback', async function(req, res, next) {
     let token
     try {
         token = await getGoogleAccessToken()
@@ -50,8 +50,8 @@ router.post('/', async function(req, res, next) {
     const { replyToken, source } = events[0];
 
     if(uploadTokens.length === 0) {
-        console.log('No image', e)
-        await replyMessage(events[0].replyToken, "画像か動画を送ってね。")
+        console.log('No image')
+        await replyMessage(replyToken, "画像か動画を送ってね。")
         return 
     }
 

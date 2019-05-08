@@ -4,6 +4,7 @@ const router = express.Router()
 const line = require('@line/bot-sdk');
 
 const albumId = process.env.ALBUM_ID
+const googlePhotoUrl = process.env.GOOGLE_PHOTO_URL
 const config = {
     channelAccessToken: process.env.LINE_ACCESS_TOKEN,
     channelSecret: process.env.LINE_CHANNEL_SECRET,
@@ -57,7 +58,7 @@ router.post('/callback', async function(req, res, next) {
 
     try {
         await addImagesToAlbum(albumId, uploadTokens, token)
-        await replyMessage(replyToken, "画像が登録されました")
+        await replyMessage(replyToken, `画像が登録されました。\n ${googlePhotoUrl}`)
         res.json({ success: 'ok' })
     } catch (e) {
         console.log('Fails to regist to the album in Goolge photos', e)

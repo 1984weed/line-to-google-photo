@@ -1,8 +1,15 @@
 const express = require('express')
 const https = require('https')
 const router = express.Router()
+const line = require('@line/bot-sdk');
 
 const albumId = process.env.ALBUM_ID
+const config = {
+    channelAccessToken: process.env.LINE_ACCESS_TOKEN,
+    channelSecret: process.env.LINE_CHANNEL_SECRET,
+};
+
+const client = new line.Client(config);
 
 router.post('/', async function(req, res, next) {
     let token
@@ -13,16 +20,15 @@ router.post('/', async function(req, res, next) {
         return
     }
     const { events } = req.body
-    console.log(events)
+    console.log(JSON.stringify(events))
     const uploadTokens = []
-    const lineToken = process.env.LINE_ACCESS_TOKEN
     for (const e of events) {
         const { type, id } = e.message
         if (type === 'image' || type === 'video') {
             console.log(id)
             let image
             try {
-                image = await getImage(id, lineToken)
+                image = await getImage(id, config.channelAccessToken)
             } catch (e) {
                 console.log('Fails to get image from line: ', e)
                 break
@@ -41,14 +47,28 @@ router.post('/', async function(req, res, next) {
         }
     }
 
+    const { replyToken, source } = events[0];
+
+    if(uploadTokens.length === 0) {
+        console.log('No image', e)
+        await replyMessage(events[0].replyToken, "画像か動画を送ってね。")
+        return 
+    }
+
     try {
-        addImagesToAlbum(albumId, uploadTokens, token)
+        await addImagesToAlbum(albumId, uploadTokens, token)
+        await replyMessage(replyToken, "画像が登録されました")
         res.json({ success: 'ok' })
     } catch (e) {
-        console.log('Fails to regist to the album in Goolge photos')
+        console.log('Fails to regist to the album in Goolge photos', e)
         return
     }
 })
+
+function replyMessage(replyToken, text) {
+    console.log(replyToken)
+    return client.replyMessage(replyToken, { type: "text", text });
+}
 
 function getExtenstionFromType(type) {
     if (type === 'image') {

@@ -5,6 +5,11 @@ const lineRouter = require('./routes/line')
 const app = express();
 const bodyParser = require('body-parser')
 
+const connectionString = process.env.DATABASE_URL + "?ssl=true" || "postgres://postgres@localhost/postgres";
+const massive = require("massive");
+const massiveInstance = massive.connectSync({connectionString : connectionString});
+app.set('db', massiveInstance);
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json

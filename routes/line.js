@@ -25,6 +25,9 @@ router.post('/callback', async function(req, res, next) {
     const uploadTokens = []
     for (const e of events) {
         const { type, id } = e.message
+        if(type === 'join') {
+            return;
+        }
         if (type === 'image' || type === 'video') {
             console.log(id)
             let image
@@ -52,7 +55,7 @@ router.post('/callback', async function(req, res, next) {
 
     if(uploadTokens.length === 0) {
         console.log('No image')
-        await replyMessage(replyToken, "画像か動画を送ってね。")
+        await replyMessage(replyToken, "画像を送ってね。")
         return 
     }
 
@@ -67,7 +70,6 @@ router.post('/callback', async function(req, res, next) {
 })
 
 function replyMessage(replyToken, text) {
-    console.log(replyToken)
     return client.replyMessage(replyToken, { type: "text", text });
 }
 
@@ -161,7 +163,6 @@ function uploadImageToGooglePhotos(image, token, id, extention) {
                     reject(err)
                 })
                 .on('end', function() {
-                    console.log(data.toString())
                     if (data != null) {
                         resolve(data.toString())
                     }

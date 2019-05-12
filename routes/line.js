@@ -77,7 +77,7 @@ function getExtenstionFromType(type) {
     if (type === 'image') {
         return 'jpg'
     }
-    return 'mov'
+    return 'mp4'
 }
 
 function getImage(messageId, token) {

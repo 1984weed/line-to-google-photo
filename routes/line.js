@@ -24,10 +24,10 @@ router.post('/callback', async function(req, res, next) {
     console.log(JSON.stringify(events))
     const uploadTokens = []
     for (const e of events) {
-        const { type, id } = e.message
-        if(type === 'join') {
+        if(e.message == null) {
             return;
         }
+        const { type, id } = e.message
         if (type === 'image' || type === 'video') {
             console.log(id)
             let image

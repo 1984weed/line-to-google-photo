@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-// app.use('/line', lineRouter)
+app.use('/line', lineRouter)
 app.get('/health', function (req, res) {
   res.send('ok')
 })

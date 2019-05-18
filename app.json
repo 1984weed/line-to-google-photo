@@ -1,6 +1,6 @@
 {
   "name": "Line to google photo app",
-  "description": "",
+  "description": "Line bot to send photo/mp4 to google photos",
   "repository": "https://github.com/1984weed/line-to-google-photo",
   "logo": "https://github.com/1984weed/line-to-google-photo",
   "keywords": ["node", "express", "heroku"],

@@ -1,16 +1,16 @@
 const express = require('express')
 const https = require('https')
 const router = express.Router()
-const line = require('@line/bot-sdk');
+const line = require('@line/bot-sdk')
 
 const albumId = process.env.ALBUM_ID
 const googlePhotoUrl = process.env.GOOGLE_PHOTO_URL
 const config = {
     channelAccessToken: process.env.LINE_ACCESS_TOKEN,
     channelSecret: process.env.LINE_CHANNEL_SECRET,
-};
+}
 
-const client = new line.Client(config);
+const client = new line.Client(config)
 
 router.post('/callback', async function(req, res, next) {
     let token
@@ -24,8 +24,8 @@ router.post('/callback', async function(req, res, next) {
     console.log(JSON.stringify(events))
     const uploadTokens = []
     for (const e of events) {
-        if(e.message == null) {
-            return;
+        if (e.message == null) {
+            return
         }
         const { type, id } = e.message
         if (type === 'image' || type === 'video') {
@@ -51,17 +51,20 @@ router.post('/callback', async function(req, res, next) {
         }
     }
 
-    const { replyToken, source } = events[0];
+    const { replyToken, source } = events[0]
 
-    if(uploadTokens.length === 0) {
+    if (uploadTokens.length === 0) {
         console.log('No image')
-        await replyMessage(replyToken, "画像を送ってね。")
-        return 
+        await replyMessage(replyToken, '画像を送ってね。')
+        return
     }
 
     try {
         await addImagesToAlbum(albumId, uploadTokens, token)
-        await replyMessage(replyToken, `画像が登録されました。\n ${googlePhotoUrl}`)
+        await replyMessage(
+            replyToken,
+            `画像が登録されました。\n ${googlePhotoUrl}`
+        )
         res.json({ success: 'ok' })
     } catch (e) {
         console.log('Fails to regist to the album in Goolge photos', e)
@@ -70,7 +73,7 @@ router.post('/callback', async function(req, res, next) {
 })
 
 function replyMessage(replyToken, text) {
-    return client.replyMessage(replyToken, { type: "text", text });
+    return client.replyMessage(replyToken, { type: 'text', text })
 }
 
 function getExtenstionFromType(type) {
